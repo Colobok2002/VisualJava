@@ -60,11 +60,3 @@ public class Person {
             this.email.set(email);
         }
     }
-
-// public void saveChanges(tableView) {
-//         tableView.getItems().forEach(row -> {
-//             if (tableView.getEditingCell() != null) {
-//                 tableView.edit(tableView.getEditingCell().getRow(), null);
-//             }
-//         });
-//     }
