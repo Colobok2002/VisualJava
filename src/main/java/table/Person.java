@@ -16,6 +16,10 @@ public class Person {
             this.email = new SimpleStringProperty(email);
         }
 
+        public Person copy() {
+            return new Person(this.id.get(), this.firstName.get(), this.lastName.get(), this.phone.get(), this.email.get());
+        }
+
         public String getId() {
             return id.get();
         }
@@ -56,3 +60,11 @@ public class Person {
             this.email.set(email);
         }
     }
+
+// public void saveChanges(tableView) {
+//         tableView.getItems().forEach(row -> {
+//             if (tableView.getEditingCell() != null) {
+//                 tableView.edit(tableView.getEditingCell().getRow(), null);
+//             }
+//         });
+//     }

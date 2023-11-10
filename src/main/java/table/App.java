@@ -7,15 +7,16 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 // import javafx.util.Callback;
 
-
 public class App extends Application {
 
     private ObservableList<Person> tableData = FXCollections.observableArrayList();
+    private ObservableList<Person> tableData_change = FXCollections.observableArrayList();
 
     public static void main(String[] args) {
         launch(args);
@@ -26,18 +27,21 @@ public class App extends Application {
         primaryStage.setTitle("Editable JavaFX Table");
 
         TableView<Person> tableView = new TableView<>();
-        tableView.setEditable(true);
+        tableView.setEditable(false);
 
         TableColumn<Person, String> idColumn = new TableCol().createColumn("ID", "id");
-        TableColumn<Person, String> firstNameColumn =  new TableCol().createColumn("Имя", "firstName");
-        TableColumn<Person, String> lastNameColumn =  new TableCol().createColumn("Фамилия", "lastName");
-        TableColumn<Person, String> phoneColumn =  new TableCol().createColumn("Телефон", "phone");
-        TableColumn<Person, String> emailColumn =  new TableCol().createColumn("Почта", "email");
+        TableColumn<Person, String> firstNameColumn = new TableCol().createColumn("Имя", "firstName");
+        TableColumn<Person, String> lastNameColumn = new TableCol().createColumn("Фамилия", "lastName");
+        TableColumn<Person, String> phoneColumn = new TableCol().createColumn("Телефон", "phone");
+        TableColumn<Person, String> emailColumn = new TableCol().createColumn("Почта", "email");
 
         tableView.getColumns().addAll(idColumn, firstNameColumn, lastNameColumn, phoneColumn, emailColumn);
 
         Button addButton = new Button("Добавить");
         Button deleteButton = new Button("Удалить");
+        Button editButton = new Button("Изменить");
+        Button saveButton = new Button("Сохранить");
+        Button backButton = new Button("Отменить");
 
         addButton.setOnAction(event -> {
             try {
@@ -60,11 +64,33 @@ public class App extends Application {
             }
         });
 
+        editButton.setOnAction(event -> {
+            tableData_change.clear();
+            for (Person person : tableData) {
+                tableData_change.add(person.copy());
+            }
+            tableView.setEditable(true);
+        });
+
+        saveButton.setOnAction(event -> {
+            tableView.setEditable(false);
+            tableView.setItems(tableData);
+
+        });
+
+        backButton.setOnAction(event -> {
+            tableView.setEditable(false);
+            tableData.clear();
+            tableData.addAll(tableData_change);
+            tableView.setItems(tableData);
+        });
+
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(10, 10, 10, 10));
         vbox.getChildren().addAll(
                 tableView,
-                new HBox(10, addButton, deleteButton));
+                new HBox(10, addButton, deleteButton),
+                new HBox(10, editButton, saveButton ,backButton));
 
         Scene scene = new Scene(vbox, 600, 400);
 
@@ -72,6 +98,4 @@ public class App extends Application {
 
         primaryStage.show();
     }
-
-
 }
