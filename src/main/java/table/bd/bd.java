@@ -1,33 +1,52 @@
 package table.bd;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.persister.entity.AbstractEntityPersister;
+import org.hibernate.persister.entity.EntityPersister;
+
+import javafx.scene.control.cell.PropertyValueFactory;
+import table.bd.models.Users;
 
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
-
-import javax.persistence.Column; // Import the Column annotation
-import table.bd.models.Person;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
+import java.util.Map;
 
 public class bd {
-    // Dynamically fetch column names from the model class
-    public static List<TableColumn<Person, String>> getTableColumnsFromModel(Class<?> modelClass) {
-        List<TableColumn<Person, String>> columns = new ArrayList<>();
 
-        Field[] fields = modelClass.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType() == String.class) {
-                // Assuming your model has proper annotations like @Column
-                Column columnAnnotation = field.getAnnotation(Column.class);
-                if (columnAnnotation != null) {
-                    TableColumn<Person, String> column = new TableColumn<>(columnAnnotation.name());
-                    column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
-                    columns.add(column);
+    public static List<TableColumn<Users, String>> getColumns(Session session, Class<Users> _class) {
+        MetamodelImplementor metamodel = (MetamodelImplementor) session.getSessionFactory().getMetamodel();
+        Map<String, EntityPersister> entities = metamodel.entityPersisters();
+
+        for (EntityPersister entityType : entities.values()) {
+            String entityName = entityType.getEntityName();
+            System.out.println("Entity: " + entityName);
+
+            if (entityType instanceof AbstractEntityPersister) {
+                AbstractEntityPersister entityPersister = (AbstractEntityPersister) entityType;
+
+                if (entityPersister.getMappedClass().equals(_class)) {
+                    // Found the entity matching the specified class
+                    String[] columnNames = entityPersister.getPropertyNames();
+                    List<TableColumn<Users, String>> columns = new ArrayList<>();
+
+                    for (String columnName : columnNames) {
+                        System.out.println("    Столбец: " + columnName);
+
+                        TableColumn<Users, String> column = new TableColumn<>(columnName);
+                        column.setCellValueFactory(new PropertyValueFactory<>(columnName));
+                        columns.add(column);
+                    }
+
+                    return columns;
                 }
             }
         }
+        return null;
 
-        return columns;
+        // return Collections.emptyList(); 
     }
+
 }

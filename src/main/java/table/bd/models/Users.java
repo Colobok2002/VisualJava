@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "people")
-public class Person {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
@@ -25,7 +25,7 @@ public class Person {
     @Column(name = "email")
     private String email;
 
-    public Person(BigInteger id, String firstName, String lastName, String phone, String email) {
+    public Users(BigInteger id, String firstName, String lastName, String phone, String email) {
         this.id = id;
         this.firstName = new String(firstName);
         this.lastName = new String(lastName);
@@ -33,8 +33,8 @@ public class Person {
         this.email = new String(email);
     }
 
-    public Person copy() {
-        return new Person(this.id, this.firstName, this.lastName, this.phone, this.email);
+    public Users copy() {
+        return new Users(this.id, this.firstName, this.lastName, this.phone, this.email);
     }
 
     public BigInteger getId() {
