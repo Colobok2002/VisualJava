@@ -1,4 +1,7 @@
+table/bd/models/Person.class
 table/App.class
 table/Person.class
 table/TableCol.class
 module-info.class
+table/bd/bd.class
+table/bd/Connect.class
