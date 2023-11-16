@@ -3,6 +3,8 @@ package table;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -25,17 +28,18 @@ import java.util.List;
 
 public class App extends Application {
 
-    private ObservableList<Users> tableData = FXCollections.observableArrayList();
-    // private ObservableList<Person> tableData_change =
-    // FXCollections.observableArrayList();
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+    ObservableList<Users> tableData = FXCollections.observableArrayList();
 
     SessionFactory sessionFactory = Connect.getSessionFactory();
 
     Session session = sessionFactory.openSession();
+    
+    private boolean edit = false;
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     List<TableColumn<Users, String>> columns = bd.getColumns(session, Users.class);
 
@@ -44,63 +48,85 @@ public class App extends Application {
         primaryStage.setTitle("Editable JavaFX Table");
 
         TableView<Users> tableView = new TableView<>();
+
         tableView.setEditable(false);
-
-        // Fetch data from the database
-        // tableData.addAll(getAllPeopleFromDatabase());
-
-        tableView.setItems(tableData);
-
-        // List<TableColumn<Person, String>> columns =
-        // bd.getTableColumnsFromModel(connect, Person.class);
-
-        // Add the generated columns to the table
-        // tableView.getColumns().addAll(columns);
 
         tableView.getColumns().addAll(columns);
 
+        try {
+
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            Query<Users> query = session.createQuery("from Users", Users.class);
+            List<Users> resultList = query.getResultList();
+            
+            tableData =FXCollections.observableArrayList(resultList);
+
+            tableView.setItems(tableData);
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        Button editButton = new Button("Изменить");
         Button addButton = new Button("Добавить");
         Button deleteButton = new Button("Удалить");
-        Button editButton = new Button("Изменить");
         Button saveButton = new Button("Сохранить");
         Button backButton = new Button("Отменить");
+        
+
+        addButton.setVisible(false);
+        deleteButton.setVisible(false);
+        saveButton.setVisible(false);
+        backButton.setVisible(false);
+
+        editButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                edit = !edit;
+                tableView.setEditable(edit);
+                addButton.setVisible(edit);
+                deleteButton.setVisible(edit);
+                saveButton.setVisible(edit);
+                backButton.setVisible(edit);
+            }
+        });
 
         addButton.setOnAction(event -> {
-            try {
-                // BigInteger nextId = tableData.isEmpty() ? BigInteger.ZERO
-                // : tableData.stream()
-                // .map(Users::getId)
-                // .max(Comparator.naturalOrder())
-                // .orElse(BigInteger.ZERO)
-                // .add(BigInteger.ONE);
 
-                // // savePersonToDatabase(new Users(nextId, "", "", "", ""));
+            // try {
 
-                // tableData.add(new Users(nextId, "", "", "", ""));
-                // tableView.setItems(tableData);
-                Users user = new Users(null, "1", "2",
-                        "3", "4");
+            //     Users user = new Users(null, "1", "2",
+            //             "3", "4");
 
-                Transaction transaction = null;
-                try {
-                    transaction = session.beginTransaction();
+            //     Transaction transaction = null;
+            //     Session session = sessionFactory.openSession();
+            //     try {
 
-                    // сохранение объекта user
-                    session.save(user);
+            //         transaction = session.beginTransaction();
 
-                    transaction.commit();
-                } catch (Exception e) {
-                    if (transaction != null) {
-                        transaction.rollback();
-                    }
-                    e.printStackTrace();
-                } finally {
-                    session.close();
-                }
+            //         session.save(user);
 
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка: ID должен быть числом.");
-            }
+            //         transaction.commit();
+            //     } catch (Exception e) {
+            //         if (transaction != null) {
+            //             transaction.rollback();
+            //         }
+            //         e.printStackTrace();
+            //     } finally {
+            //         session.close();
+            //     }
+
+            // } catch (NumberFormatException e) {
+            //     System.out.println("Ошибка: ID должен быть числом.");
+            // }
         });
 
         VBox vbox = new VBox(10);
@@ -116,22 +142,5 @@ public class App extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    // Fetch all people from the database
-    // private ObservableList<Users> getAllPeopleFromDatabase() {
-    // try (Session session = sessionFactory.openSession()) {
-    // return FXCollections.observableArrayList(session.createQuery("FROM Person",
-    // Users.class).list());
-    // }
-    // }
-
-    // // Save a person to the database
-    // private void savePersonToDatabase(Users person) {
-    // try (Session session = sessionFactory.openSession()) {
-    // session.beginTransaction();
-    // session.save(person);
-    // session.getTransaction().commit();
-    // }
-    // }
 
 }

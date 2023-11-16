@@ -6,10 +6,11 @@ module table {
     requires transitive org.hibernate.orm.core;
     requires java.sql;
 
-    // requires org.xerial.sqlitejdbc; 
+    // requires org.xerial.sqlitejdbc;
     requires org.xerial.sqlitejdbc;
 
     opens table to javafx.fxml;
-    opens table.bd.models to org.hibernate.orm.core;
+    opens table.bd.models to org.hibernate.orm.core, javafx.base, javafx.controls, javafx.graphics;
+
     exports table;
 }

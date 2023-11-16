@@ -12,7 +12,7 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private BigInteger id;
+    private String id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -26,7 +26,10 @@ public class Users {
     @Column(name = "email")
     private String email;
 
-    public Users(BigInteger id, String firstName, String lastName, String phone, String email) {
+    public Users() {
+    }
+
+    public Users(String id, String firstName, String lastName, String phone, String email) {
         this.id = id;
         this.firstName = new String(firstName);
         this.lastName = new String(lastName);
@@ -38,7 +41,7 @@ public class Users {
         return new Users(this.id, this.firstName, this.lastName, this.phone, this.email);
     }
 
-    public BigInteger getId() {
+    public String getId() {
         return this.id;
     }
 
