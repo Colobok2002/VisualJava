@@ -43,11 +43,15 @@ public class Users {
         return this.id;
     }
 
+    public String setid(String id) {
+        return this.id = id;
+    }
+
     public String getFirstName() {
         return this.firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setfirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -55,7 +59,7 @@ public class Users {
         return this.lastName;
     }
 
-    public void setLastName(String lastName) {
+    public void setlastName(String lastName) {
         this.lastName = lastName;
     }
 
@@ -63,7 +67,7 @@ public class Users {
         return this.phone;
     }
 
-    public void setPhone(String phone) {
+    public void setphone(String phone) {
         this.phone = phone;
     }
 
@@ -71,7 +75,7 @@ public class Users {
         return this.email;
     }
 
-    public void setEmail(String email) {
+    public void setemail(String email) {
         this.email = email;
     }
 }

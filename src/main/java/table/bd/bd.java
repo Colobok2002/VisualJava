@@ -67,26 +67,6 @@ public class bd {
         return null;
     }
 
-    public static class UserDao {
-        private EntityManagerFactory emf;
-        private EntityManager em;
-
-        public UserDao() {
-            emf = Persistence.createEntityManagerFactory("usersPersistenceUnit");
-            em = emf.createEntityManager();
-        }
-
-        public void insertUser(Users user) {
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-        }
-
-        public void close() {
-            em.close();
-            emf.close();
-        }
-    }
 
     public static ObservableList<Users> getValues(SessionFactory sessionFactory, Class<Users> _class) {
         Session session = sessionFactory.openSession();

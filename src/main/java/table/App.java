@@ -14,7 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -116,6 +115,7 @@ public class App extends Application {
             if (selectedUser != null) {
                 // Удалить из ObservableList
                 tableData.remove(selectedUser);
+                // tableView.getTableRow().getStyleClass().remove("non-empty-column");
             } else {
                 // Если ничего не выбрано, показать сообщение пользователю
                 System.out.println("No User selected for deletion.");
@@ -153,18 +153,24 @@ public class App extends Application {
                 try {
                     transaction = session.beginTransaction();
 
-                    Users existUser = session.get(Users.class, user.getId());
+                    if (user.getId() != null) {
+                        System.out.println("2");
+                        Users existUser = session.get(Users.class, user.getId());
 
-                    if (existUser == null) {
-                        session.save(user);
+                        if (existUser == null) {
+                            user.setid(null);
+                            session.save(user);
+                        } else {
+                            existUser.setfirstName(user.getFirstName());
+                            existUser.setlastName(user.getLastName());
+                            existUser.setphone(user.getPhone());
+                            existUser.setemail(user.getEmail());
+                        }
+
                     } else {
-                        existUser.setFirstName(user.getFirstName());
-                        existUser.setLastName(user.getLastName());
-                        existUser.setPhone(user.getPhone());
-                        existUser.setEmail(user.getEmail());
-                        session.update(existUser);
+                        System.out.println("1");
+                        session.save(user);
                     }
-
                     transaction.commit();
                 } catch (Exception e) {
                     if (transaction != null) {
@@ -188,6 +194,7 @@ public class App extends Application {
                 new HBox(10, saveButton, backButton));
 
         Scene scene = new Scene(vbox, 600, 400);
+        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
