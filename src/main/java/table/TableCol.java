@@ -9,7 +9,8 @@ import javafx.util.converter.DefaultStringConverter;
 import table.bd.models.Users;
 
 public class TableCol {
-    TableColumn<Users, String> createColumn(String columnName, String propertyName) {
+    public TableColumn<Users, String> createColumn(String columnName, String propertyName) {
+        
         TableColumn<Users, String> column = new TableColumn<>(columnName);
 
         column.setCellValueFactory(new PropertyValueFactory<>(propertyName));
@@ -19,25 +20,22 @@ public class TableCol {
             TablePosition<Users, String> pos = event.getTablePosition();
             String newValue = event.getNewValue();
             Users person = event.getRowValue();
-            // switch (pos.getColumn()) {
-            //     case 0:
-            //         person.setId(newValue);
-            //         break;
-            //     case 1:
-            //         person.setFirstName(newValue);
-            //         break;
-            //     case 2:
-            //         person.setLastName(newValue);
-            //         break;
-            //     case 3:
-            //         person.setPhone(newValue);
-            //         break;
-            //     case 4:
-            //         person.setEmail(newValue);
-            //         break;
-            // }
+            switch (pos.getColumn()) {
+                case 1:
+                    person.setFirstName(newValue);
+                    break;
+                case 2:
+                    person.setLastName(newValue);
+                    break;
+                case 3:
+                    person.setPhone(newValue);
+                    break;
+                case 4:
+                    person.setEmail(newValue);
+                    break;
+            }
         });
-        
+
         return column;
     }
 

@@ -14,13 +14,12 @@ import javafx.stage.Stage;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
 import table.bd.Connect;
 import table.bd.models.Users;
 
 import table.bd.bd;
-
-import java.math.BigInteger;
-import java.util.Comparator;
 
 import java.util.List;
 
@@ -68,17 +67,37 @@ public class App extends Application {
 
         addButton.setOnAction(event -> {
             try {
-                BigInteger nextId = tableData.isEmpty() ? BigInteger.ZERO
-                        : tableData.stream()
-                                .map(Users::getId)
-                                .max(Comparator.naturalOrder())
-                                .orElse(BigInteger.ZERO)
-                                .add(BigInteger.ONE);
+                // BigInteger nextId = tableData.isEmpty() ? BigInteger.ZERO
+                // : tableData.stream()
+                // .map(Users::getId)
+                // .max(Comparator.naturalOrder())
+                // .orElse(BigInteger.ZERO)
+                // .add(BigInteger.ONE);
 
-                // savePersonToDatabase(new Users(nextId, "", "", "", ""));
+                // // savePersonToDatabase(new Users(nextId, "", "", "", ""));
 
-                tableData.add(new Users(nextId, "", "", "", ""));
-                tableView.setItems(tableData);
+                // tableData.add(new Users(nextId, "", "", "", ""));
+                // tableView.setItems(tableData);
+                Users user = new Users(null, "1", "2",
+                        "3", "4");
+
+                Transaction transaction = null;
+                try {
+                    transaction = session.beginTransaction();
+
+                    // сохранение объекта user
+                    session.save(user);
+
+                    transaction.commit();
+                } catch (Exception e) {
+                    if (transaction != null) {
+                        transaction.rollback();
+                    }
+                    e.printStackTrace();
+                } finally {
+                    session.close();
+                }
+
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: ID должен быть числом.");
             }
@@ -100,18 +119,19 @@ public class App extends Application {
 
     // Fetch all people from the database
     // private ObservableList<Users> getAllPeopleFromDatabase() {
-    //     try (Session session = sessionFactory.openSession()) {
-    //         return FXCollections.observableArrayList(session.createQuery("FROM Person", Users.class).list());
-    //     }
+    // try (Session session = sessionFactory.openSession()) {
+    // return FXCollections.observableArrayList(session.createQuery("FROM Person",
+    // Users.class).list());
+    // }
     // }
 
     // // Save a person to the database
     // private void savePersonToDatabase(Users person) {
-    //     try (Session session = sessionFactory.openSession()) {
-    //         session.beginTransaction();
-    //         session.save(person);
-    //         session.getTransaction().commit();
-    //     }
+    // try (Session session = sessionFactory.openSession()) {
+    // session.beginTransaction();
+    // session.save(person);
+    // session.getTransaction().commit();
+    // }
     // }
 
 }

@@ -11,6 +11,7 @@ import javax.persistence.*;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private BigInteger id;
 
     @Column(name = "first_name")
@@ -19,7 +20,7 @@ public class Users {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "phone" )
+    @Column(name = "phone")
     private String phone;
 
     @Column(name = "email")
@@ -41,39 +42,35 @@ public class Users {
         return this.id;
     }
 
-    // public void setId(String id) {
-    //     this.id.set(id);
-    // }
-
     public String getFirstName() {
         return this.firstName;
     }
 
-    // public void setFirstName(String firstName) {
-    //     this.firstName.set(firstName);
-    // }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
     public String getLastName() {
         return this.lastName;
     }
 
-    // public void setLastName(String lastName) {
-    // this.lastName.set(lastName);
-    // }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getPhone() {
         return this.phone;
     }
 
-    // public void setPhone(String phone) {
-    //     this.phone.set(phone);
-    // }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public String getEmail() {
         return this.email;
     }
 
-    // public void setEmail(String email) {
-    // this.email.set(email);
-    // }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

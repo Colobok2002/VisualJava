@@ -11,6 +11,5 @@ module table {
 
     opens table to javafx.fxml;
     opens table.bd.models to org.hibernate.orm.core;
-
     exports table;
 }
