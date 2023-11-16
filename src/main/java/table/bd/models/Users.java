@@ -2,8 +2,6 @@ package table.bd.models;
 
 // import javafx.beans.property.SimpleStringProperty;
 
-import java.math.BigInteger;
-
 import javax.persistence.*;
 
 @Entity

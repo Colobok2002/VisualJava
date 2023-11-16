@@ -10,7 +10,7 @@ import table.bd.models.Users;
 
 public class TableCol {
     public TableColumn<Users, String> createColumn(String columnName, String propertyName) {
-        
+
         TableColumn<Users, String> column = new TableColumn<>(columnName);
 
         column.setCellValueFactory(new PropertyValueFactory<>(propertyName));

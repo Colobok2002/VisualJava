@@ -32,16 +32,13 @@ public class App extends Application {
 
     SessionFactory sessionFactory = Connect.getSessionFactory();
 
-    Session session = sessionFactory.openSession();
-    
     private boolean edit = false;
-
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    List<TableColumn<Users, String>> columns = bd.getColumns(session, Users.class);
+    List<TableColumn<Users, String>> columns = bd.getColumns(sessionFactory, Users.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -53,34 +50,15 @@ public class App extends Application {
 
         tableView.getColumns().addAll(columns);
 
-        try {
+        tableData = bd.getValues(sessionFactory, Users.class);
 
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-
-            Query<Users> query = session.createQuery("from Users", Users.class);
-            List<Users> resultList = query.getResultList();
-            
-            tableData =FXCollections.observableArrayList(resultList);
-
-            tableView.setItems(tableData);
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
+        tableView.setItems(tableData);
 
         Button editButton = new Button("Изменить");
         Button addButton = new Button("Добавить");
         Button deleteButton = new Button("Удалить");
         Button saveButton = new Button("Сохранить");
         Button backButton = new Button("Отменить");
-        
 
         addButton.setVisible(false);
         deleteButton.setVisible(false);
@@ -103,30 +81,102 @@ public class App extends Application {
 
             // try {
 
-            //     Users user = new Users(null, "1", "2",
-            //             "3", "4");
+            // Users user = new Users(null, "1", "2",
+            // "3", "4");
 
-            //     Transaction transaction = null;
-            //     Session session = sessionFactory.openSession();
-            //     try {
+            // Transaction transaction = null;
+            // Session session = sessionFactory.openSession();
+            // try {
 
-            //         transaction = session.beginTransaction();
+            // transaction = session.beginTransaction();
 
-            //         session.save(user);
+            // session.save(user);
 
-            //         transaction.commit();
-            //     } catch (Exception e) {
-            //         if (transaction != null) {
-            //             transaction.rollback();
-            //         }
-            //         e.printStackTrace();
-            //     } finally {
-            //         session.close();
-            //     }
+            // transaction.commit();
+            // } catch (Exception e) {
+            // if (transaction != null) {
+            // transaction.rollback();
+            // }
+            // e.printStackTrace();
+            // } finally {
+            // session.close();
+            // }
 
             // } catch (NumberFormatException e) {
-            //     System.out.println("Ошибка: ID должен быть числом.");
+            // System.out.println("Ошибка: ID должен быть числом.");
             // }
+            tableData.add(new Users());
+            tableView.setItems(tableData);
+        });
+
+        deleteButton.setOnAction(event -> {
+            Users selectedUser = tableView.getSelectionModel().getSelectedItem();
+
+            // Убедиться, что объект не равен null
+            if (selectedUser != null) {
+                // Удалить из ObservableList
+                tableData.remove(selectedUser);
+            } else {
+                // Если ничего не выбрано, показать сообщение пользователю
+                System.out.println("No User selected for deletion.");
+            }
+        });
+
+        backButton.setOnAction(event -> {
+            tableData = bd.getValues(sessionFactory, Users.class);
+            tableView.setItems(tableData);
+        });
+
+        saveButton.setOnAction(event -> {
+            Session session = sessionFactory.openSession();
+
+            List<Users> existingUsers = session.createQuery("from Users", Users.class).getResultList();
+
+            for (Users user : existingUsers) {
+                if (!tableData.contains(user)) {
+                    Transaction transaction = null;
+                    try {
+                        transaction = session.beginTransaction();
+                        session.delete(user);
+                        transaction.commit();
+                    } catch (Exception ex) {
+                        if (transaction != null)
+                            transaction.rollback();
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
+            for (Users user : tableData) {
+                Transaction transaction = null;
+
+                try {
+                    transaction = session.beginTransaction();
+
+                    Users existUser = session.get(Users.class, user.getId());
+
+                    if (existUser == null) {
+                        session.save(user);
+                    } else {
+                        existUser.setFirstName(user.getFirstName());
+                        existUser.setLastName(user.getLastName());
+                        existUser.setPhone(user.getPhone());
+                        existUser.setEmail(user.getEmail());
+                        session.update(existUser);
+                    }
+
+                    transaction.commit();
+                } catch (Exception e) {
+                    if (transaction != null) {
+                        transaction.rollback();
+                    }
+                    e.printStackTrace();
+                }
+            }
+
+            session.close();
+            tableData = bd.getValues(sessionFactory, Users.class);
+            tableView.setItems(tableData);
         });
 
         VBox vbox = new VBox(10);
