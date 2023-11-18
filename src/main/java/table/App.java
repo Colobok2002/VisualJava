@@ -6,20 +6,29 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.mapping.Set;
+
+import java.util.Arrays;
 
 import table.bd.Connect;
 import table.bd.models.Users;
+import java.util.ArrayList;
 
 import table.bd.bd;
 
@@ -28,6 +37,8 @@ import java.util.List;
 public class App extends Application {
 
     ObservableList<Users> tableData = FXCollections.observableArrayList();
+
+    List<String> idsToDelete = new ArrayList<>();
 
     SessionFactory sessionFactory = Connect.getSessionFactory();
 
@@ -115,9 +126,20 @@ public class App extends Application {
             if (selectedUser != null) {
                 // Удалить из ObservableList
                 tableData.remove(selectedUser);
-                // tableView.getTableRow().getStyleClass().remove("non-empty-column");
+
+                // idsToDelete.add(selectedUser.getId());
+                // int index = tableView.getItems().indexOf(selectedUser);
+
+                // int index = 1; // Индекс строки, которую вы хотите найти
+                // String selector = ".table-row-cell";
+                // ObservableList<Node> row = (ObservableList<Node>)
+                // tableView.lookupAll(".table-row-cell");
+                // System.out.println(row);
+                // // if (row != null) {
+                // // row.setStyle("-fx-background-color: #ff0000;");
+                // // }
+
             } else {
-                // Если ничего не выбрано, показать сообщение пользователю
                 System.out.println("No User selected for deletion.");
             }
         });
@@ -130,22 +152,7 @@ public class App extends Application {
         saveButton.setOnAction(event -> {
             Session session = sessionFactory.openSession();
 
-            List<Users> existingUsers = session.createQuery("from Users", Users.class).getResultList();
-
-            for (Users user : existingUsers) {
-                if (!tableData.contains(user)) {
-                    Transaction transaction = null;
-                    try {
-                        transaction = session.beginTransaction();
-                        session.delete(user);
-                        transaction.commit();
-                    } catch (Exception ex) {
-                        if (transaction != null)
-                            transaction.rollback();
-                        ex.printStackTrace();
-                    }
-                }
-            }
+            bd.deleteUsersByIds(session, idsToDelete);
 
             for (Users user : tableData) {
                 Transaction transaction = null;
@@ -153,14 +160,12 @@ public class App extends Application {
                 try {
                     transaction = session.beginTransaction();
 
-                    if (user.getId() != null) {
-                        System.out.println("2");
-                        Users existUser = session.get(Users.class, user.getId());
+                    if (user.getId() != null && user.getId() != 0) {
 
-                        if (existUser == null) {
-                            user.setid(null);
-                            session.save(user);
-                        } else {
+                        Users existUser = session.get(Users.class, user.getId());
+                        System.out.println(existUser);
+
+                        if (existUser != null) {
                             existUser.setfirstName(user.getFirstName());
                             existUser.setlastName(user.getLastName());
                             existUser.setphone(user.getPhone());
@@ -179,7 +184,20 @@ public class App extends Application {
                     e.printStackTrace();
                 }
             }
-
+            // for (Users user : existingUsers) {
+            // if (!tableData.contains(user)) {
+            // Transaction transaction = null;
+            // try {
+            // transaction = session.beginTransaction();
+            // session.delete(user);
+            // transaction.commit();
+            // } catch (Exception ex) {
+            // if (transaction != null)
+            // transaction.rollback();
+            // ex.printStackTrace();
+            // }
+            // }
+            // }
             session.close();
             tableData = bd.getValues(sessionFactory, Users.class);
             tableView.setItems(tableData);

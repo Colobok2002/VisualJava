@@ -10,7 +10,6 @@ import javafx.util.converter.DefaultStringConverter;
 import table.bd.models.Users;
 import java.lang.reflect.Method;
 
-
 public class TableCol {
     public TableColumn<Users, String> createColumn(String columnName, String propertyName) {
 
@@ -37,8 +36,8 @@ public class TableCol {
                         TableView<?> tableView = getTableView();
                         if (tableView != null && getIndex() < tableView.getItems().size()) {
                             Users person = (Users) tableView.getItems().get(getIndex());
-                            String firstCellItem = person.getId();
-                            if (firstCellItem == null || firstCellItem.toString().isEmpty()) {
+                            Integer firstCellItem = person.getId();
+                            if ( firstCellItem == null || firstCellItem == 0 ||firstCellItem.toString().isEmpty()) {
                                 getTableRow().getStyleClass().remove("non-new-row");
                                 getTableRow().getStyleClass().add("new-row");
                             } else {
@@ -53,7 +52,6 @@ public class TableCol {
 
             return cell;
         });
-
 
         column.setOnEditCommit(event -> {
             TablePosition<Users, String> pos = event.getTablePosition();

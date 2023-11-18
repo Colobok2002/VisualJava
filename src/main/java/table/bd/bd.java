@@ -13,12 +13,10 @@ import table.bd.models.Users;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import table.TableCol;
 
@@ -45,8 +43,8 @@ public class bd {
                     for (String columnName : columKey) {
                         System.out.println("    Внешний ключь: " + columnName);
 
-                        TableColumn<Users, String> column = new TableCol().createColumn(columnName + " (key)",
-                                columnName);
+                        TableColumn<Users, String> column = new TableColumn<>(columnName + " (key)");
+                        column.setCellValueFactory(new PropertyValueFactory<>(columnName));
 
                         columns.add(column);
                     }
@@ -67,7 +65,6 @@ public class bd {
         return null;
     }
 
-
     public static ObservableList<Users> getValues(SessionFactory sessionFactory, Class<Users> _class) {
         Session session = sessionFactory.openSession();
         ObservableList<Users> tableData = null;
@@ -87,6 +84,29 @@ public class bd {
             session.close();
         }
         return tableData;
+    }
+
+    public static void deleteUsersByIds(Session session, List<String> idsArray) {
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Перебираем массив идентификаторов и удаляем записи
+            for (String id : idsArray) {
+                Users user = session.get(Users.class, id);
+                if (user != null) {
+                    session.delete(user);
+                }
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
 }

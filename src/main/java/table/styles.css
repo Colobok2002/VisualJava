@@ -1,7 +1,11 @@
 .new-row {
     -fx-background-color: rgb(120, 204, 111);
-    -fx-background-color: rgb(120, 204, 111);
     -fx-border-color: green;
     -fx-border-width: 1;
     -fx-border-style: solid;
+}
+
+
+.non-new-row {
+    /* -fx-background-color: rgb(71, 104, 67); */
 }

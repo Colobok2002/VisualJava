@@ -5,12 +5,12 @@ package table.bd.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "people")
+@Table(name = "people_barinov")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private String id;
+    private Integer id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -27,7 +27,7 @@ public class Users {
     public Users() {
     }
 
-    public Users(String id, String firstName, String lastName, String phone, String email) {
+    public Users(Integer id, String firstName, String lastName, String phone, String email) {
         this.id = id;
         this.firstName = new String(firstName);
         this.lastName = new String(lastName);
@@ -39,11 +39,15 @@ public class Users {
         return new Users(this.id, this.firstName, this.lastName, this.phone, this.email);
     }
 
-    public String getId() {
-        return this.id;
+    public Integer getId() {
+        if (this.id == null) {
+            return null;
+        } else {
+            return this.id;
+        }
     }
 
-    public String setid(String id) {
+    public Integer setid(Integer id) {
         return this.id = id;
     }
 
