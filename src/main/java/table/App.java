@@ -6,26 +6,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.skin.TableHeaderRow;
-import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.mapping.Set;
-
-import java.util.Arrays;
-
 import table.bd.Connect;
 import table.bd.models.Users;
 import java.util.ArrayList;
@@ -41,6 +34,7 @@ public class App extends Application {
     List<String> idsToDelete = new ArrayList<>();
 
     SessionFactory sessionFactory = Connect.getSessionFactory();
+    Users[] existingUsers;
 
     private boolean edit = false;
 
@@ -69,6 +63,7 @@ public class App extends Application {
         Button deleteButton = new Button("Удалить");
         Button saveButton = new Button("Сохранить");
         Button backButton = new Button("Отменить");
+        Button InfoButton = new Button("?");
 
         addButton.setVisible(false);
         deleteButton.setVisible(false);
@@ -122,22 +117,8 @@ public class App extends Application {
         deleteButton.setOnAction(event -> {
             Users selectedUser = tableView.getSelectionModel().getSelectedItem();
 
-            // Убедиться, что объект не равен null
             if (selectedUser != null) {
-                // Удалить из ObservableList
                 tableData.remove(selectedUser);
-
-                // idsToDelete.add(selectedUser.getId());
-                // int index = tableView.getItems().indexOf(selectedUser);
-
-                // int index = 1; // Индекс строки, которую вы хотите найти
-                // String selector = ".table-row-cell";
-                // ObservableList<Node> row = (ObservableList<Node>)
-                // tableView.lookupAll(".table-row-cell");
-                // System.out.println(row);
-                // // if (row != null) {
-                // // row.setStyle("-fx-background-color: #ff0000;");
-                // // }
 
             } else {
                 System.out.println("No User selected for deletion.");
@@ -215,13 +196,38 @@ public class App extends Application {
                 tableView,
                 new HBox(10, editButton),
                 new HBox(10, addButton, deleteButton),
-                new HBox(10, saveButton, backButton));
+                new HBox(10, saveButton, backButton),
+                new HBox(10, InfoButton));
 
         Scene scene = new Scene(vbox, 600, 400);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        InfoButton.setOnAction(event -> {
+
+            VBox InfoVBox = new VBox(10);
+            InfoVBox.setPadding(new Insets(10, 10, 10, 10));
+
+            Button backButton2 = new Button("Назад");
+            backButton2.setOnAction(e -> {
+                primaryStage.setScene(scene);
+            });
+
+            Hyperlink hyperlink = new Hyperlink("Сайт разработчика");
+
+            hyperlink.setOnAction(e -> {
+                getHostServices().showDocument("https://github.com/Colobok2002");
+            });
+
+            // https://github.com/Colobok2002
+            InfoVBox.getChildren().addAll(
+                    new Label("Info"), hyperlink, backButton2); 
+
+            Scene InfoScene = new Scene(InfoVBox, 400, 300);
+            primaryStage.setScene(InfoScene);
+        });
     }
 
 }
