@@ -154,6 +154,8 @@ public class App extends Application {
 
             bd.deleteUsersByIds(session, idsToDelete);
 
+            List<Users> existingUsers = session.createQuery("from Users", Users.class).getResultList();
+
             for (Users user : tableData) {
                 Transaction transaction = null;
 
@@ -166,6 +168,7 @@ public class App extends Application {
                         System.out.println(existUser);
 
                         if (existUser != null) {
+                            existUser.setid(user.getId());
                             existUser.setfirstName(user.getFirstName());
                             existUser.setlastName(user.getLastName());
                             existUser.setphone(user.getPhone());
@@ -184,20 +187,23 @@ public class App extends Application {
                     e.printStackTrace();
                 }
             }
-            // for (Users user : existingUsers) {
-            // if (!tableData.contains(user)) {
-            // Transaction transaction = null;
-            // try {
-            // transaction = session.beginTransaction();
-            // session.delete(user);
-            // transaction.commit();
-            // } catch (Exception ex) {
-            // if (transaction != null)
-            // transaction.rollback();
-            // ex.printStackTrace();
-            // }
-            // }
-            // }
+            for (Users user : existingUsers) {
+                boolean containsUser = tableData.stream().anyMatch(u -> u.getId().equals(user.getId()));
+
+                if (!containsUser) {
+                    Transaction transaction = null;
+                    try {
+                        transaction = session.beginTransaction();
+                        session.delete(user);
+                        transaction.commit();
+                    } catch (Exception ex) {
+                        if (transaction != null)
+                            transaction.rollback();
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
             session.close();
             tableData = bd.getValues(sessionFactory, Users.class);
             tableView.setItems(tableData);
